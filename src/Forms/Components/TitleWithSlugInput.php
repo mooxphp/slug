@@ -52,9 +52,9 @@ class TitleWithSlugInput
         string|Closure|null $slugRuleRegex = '/^[a-z0-9\-\_]*$/',
         string|Closure|null $slugLabelPostfix = null,
     ): Group {
-        $fieldTitle = $fieldTitle ?? config('filament-title-with-slug.field_title');
-        $fieldSlug = $fieldSlug ?? config('filament-title-with-slug.field_slug');
-        $urlHost = $urlHost ?? config('filament-title-with-slug.url_host');
+        $fieldTitle = $fieldTitle ?? config('slug.field_title');
+        $fieldSlug = $fieldSlug ?? config('slug.field_slug');
+        $urlHost = $urlHost ?? config('slug.url_host');
 
         /** Input: "Title" */
         $textInput = TextInput::make($fieldTitle)
@@ -66,18 +66,7 @@ class TitleWithSlugInput
             ->extraInputAttributes($titleExtraInputAttributes ?? ['class' => 'text-xl font-semibold'])
             ->beforeStateDehydrated(fn (TextInput $component, $state) => $component->state(trim($state)))
             ->afterStateUpdated(
-                function (
-                    $state,
-                    Set $set,
-                    Get $get,
-                    string $context,
-                    ?Model $record,
-                    TextInput $component
-                ) use (
-                    $slugSlugifier,
-                    $fieldSlug,
-                    $titleAfterStateUpdated,
-                ) {
+                function ($state, Set $set, Get $get, string $context, ?Model $record, TextInput $component) use ($slugSlugifier, $fieldSlug, $titleAfterStateUpdated) {
                     $slugAutoUpdateDisabled = $get($fieldSlug.'_slug_auto_update_disabled');
 
                     if ($context === 'edit' && filled($record)) {
@@ -125,8 +114,8 @@ class TitleWithSlugInput
             ->slugInputRecordSlug(fn (?Model $record) => data_get($record?->attributesToArray(), $fieldSlug))
             ->slugInputModelName(
                 fn (?Model $record) => $record
-                    ? Str::of(class_basename($record))->headline()
-                    : ''
+                ? Str::of(class_basename($record))->headline()
+                : ''
             )
             ->slugInputLabelPrefix($slugLabel)
             ->slugInputBasePath($urlPath)
@@ -142,17 +131,7 @@ class TitleWithSlugInput
             ->regex($slugRuleRegex)
             ->rules($slugRules)
             ->afterStateUpdated(
-                function (
-                    $state,
-                    Set $set,
-                    Get $get,
-                    TextInput $component
-                ) use (
-                    $slugSlugifier,
-                    $fieldTitle,
-                    $fieldSlug,
-                    $slugAfterStateUpdated,
-                ) {
+                function ($state, Set $set, Get $get, TextInput $component) use ($slugSlugifier, $fieldTitle, $fieldSlug, $slugAfterStateUpdated) {
                     $text = trim($state) === ''
                         ? $get($fieldTitle)
                         : $get($fieldSlug);

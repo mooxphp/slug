@@ -4,6 +4,7 @@ namespace Moox\Slug\Forms\Fields;
 
 use Closure;
 use Filament\Forms\Components\TextInput;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 
 class SlugInput extends TextInput
@@ -35,6 +36,20 @@ class SlugInput extends TextInput
     protected ?Closure $slugInputModelName = null;
 
     protected string|Closure|null $slugLabelPostfix = null;
+
+    protected string|Closure|null $helperText = null;
+
+    public function helperText(Htmlable|Closure|string|null $helperText): static
+    {
+        $this->helperText = $helperText;
+
+        return $this;
+    }
+
+    public function getHelperText(): ?string
+    {
+        return $this->evaluate($this->helperText);
+    }
 
     public function slugInputUrlVisitLinkVisible(bool|Closure $slugInputUrlVisitLinkVisible): static
     {
@@ -87,12 +102,12 @@ class SlugInput extends TextInput
             return '';
         }
 
-        return $label ?: trans('slug::package.permalink_label_link_visit').' '.$this->getSlugInputModelName();
+        return $label ?: __('slug::fields.permalink_label_link_visit').' '.$this->getSlugInputModelName();
     }
 
     public function slugInputLabelPrefix(?string $labelPrefix): static
     {
-        $this->labelPrefix = $labelPrefix ?? trans('slug::package.permalink_label');
+        $this->labelPrefix = $labelPrefix ?? __('slug::fields.permalink_label').':';
 
         return $this;
     }
